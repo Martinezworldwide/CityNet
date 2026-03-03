@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CityNet Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+<!--
+This root index.html exists so that GitHub Pages (configured with folder=/root)
+serves the interactive CityNet dashboard instead of the README.
+The actual layout, styling, and logic live in frontend/index.html and related JS files.
+-->
+<script>
+    // Redirect immediately to the frontend dashboard while staying within the same GitHub Pages site.
+    window.location.href = window.location.pathname.replace(/\/?$/, "/frontend/") + window.location.search + window.location.hash;
+</script>
+<noscript>
+    JavaScript is required for the CityNet dashboard. Please enable JavaScript and reload.
+</noscript>
+</body>
+</html>
+
