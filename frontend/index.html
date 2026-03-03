@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CityNet Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Minimal, clear styling for a simple GitHub Pages-friendly dashboard -->
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #0f172a;
+            color: #e5e7eb;
+        }
+
+        header {
+            padding: 1rem 1.5rem;
+            background: #020617;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        main {
+            padding: 1.5rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .card {
+            background: #020617;
+            border-radius: 0.75rem;
+            border: 1px solid #1e293b;
+            padding: 1rem 1.25rem;
+            box-shadow: 0 10px 20px rgba(15, 23, 42, 0.7);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            font-size: 1.1rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            color: #9ca3af;
+            margin-bottom: 0.25rem;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea {
+            width: 100%;
+            padding: 0.5rem 0.6rem;
+            border-radius: 0.5rem;
+            border: 1px solid #1f2937;
+            background: #020617;
+            color: #e5e7eb;
+            box-sizing: border-box;
+            font-size: 0.9rem;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 72px;
+        }
+
+        button {
+            margin-top: 0.5rem;
+            padding: 0.4rem 0.85rem;
+            border-radius: 999px;
+            border: none;
+            cursor: pointer;
+            background: linear-gradient(to right, #22c55e, #16a34a);
+            color: #020617;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .output {
+            margin-top: 0.5rem;
+            padding: 0.5rem 0.6rem;
+            border-radius: 0.5rem;
+            background: #020617;
+            border: 1px solid #1f2937;
+            font-size: 0.8rem;
+            white-space: pre-wrap;
+        }
+
+        .base-url {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            margin-top: 0.5rem;
+        }
+
+        .base-url input {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>CityNet Traffic Operations Dashboard</h1>
+    <div class="base-url">
+        <label for="backendBaseUrl">Backend base URL</label>
+        <input type="text" id="backendBaseUrl" value="http://localhost:8080">
+    </div>
+</header>
+<main>
+    <section class="card" id="alerts-card">
+        <h2>Heap-Prioritized Alerts</h2>
+        <label for="alertMessage">Alert message</label>
+        <input type="text" id="alertMessage" placeholder="Describe the incident">
+
+        <label for="alertSeverity">Severity (integer, higher = higher priority)</label>
+        <input type="number" id="alertSeverity" min="1" max="10" value="5">
+
+        <button id="createAlertButton">Create Alert</button>
+        <button id="nextAlertButton">Get Next Alert</button>
+
+        <div class="output" id="alertsOutput"></div>
+    </section>
+
+    <section class="card" id="routes-card">
+        <h2>Emergency Route (Recursive Dijkstra)</h2>
+        <label for="routeStart">Start intersection ID</label>
+        <input type="text" id="routeStart" placeholder="Start intersection id">
+
+        <label for="routeTarget">Target intersection ID</label>
+        <input type="text" id="routeTarget" placeholder="Target intersection id">
+
+        <button id="requestRouteButton">Request Emergency Route</button>
+
+        <div class="output" id="routesOutput"></div>
+    </section>
+
+    <section class="card" id="simulation-card">
+        <h2>Predictive Traffic Simulation</h2>
+        <label for="simulationPayload">Simulation JSON payload</label>
+        <textarea id="simulationPayload"
+                  placeholder='{"initialState":{...},"horizon":30,"timeStep":5,"congestionThreshold":10.0}'></textarea>
+
+        <button id="runSimulationButton">Run Simulation</button>
+
+        <div class="output" id="simulationOutput"></div>
+    </section>
+</main>
+
+<script src="dashboard.js"></script>
+<script src="alerts.js"></script>
+<script src="routes.js"></script>
+<script src="simulation.js"></script>
+</body>
+</html>
+

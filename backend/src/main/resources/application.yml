@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: CityNetBackend
+
+server:
+  port: 8080 # Default HTTP port for the Spring Boot backend
+
+citynet:
+  graph:
+    # This section is intentionally empty to respect the data authority rule.
+    # Users should provide real road network data from authoritative sources
+    # (for example, via configuration management or separate ingestion tools).
+    edges: [] # Real edges can be injected here by the user or external systems.
+

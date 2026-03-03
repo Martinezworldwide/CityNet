@@ -1,0 +1,57 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <!-- Maven coordinates and Spring Boot parent for backend build configuration -->
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <!-- Spring Boot parent simplifies dependency and plugin management -->
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.3.3</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
+    <groupId>com.citynet</groupId>
+    <artifactId>citynet-backend</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>CityNet Backend</name>
+    <description>CityNet Spring Boot backend for recursion, heaps, and traffic simulation demonstration</description>
+
+    <properties>
+        <!-- Use a modern LTS Java version that Spring Boot 3 supports -->
+        <java.version>17</java.version>
+    </properties>
+
+    <dependencies>
+        <!-- Spring Web starter to expose REST endpoints for routing, simulation, and alerts -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- Faster JSON serialization with Jackson (included transitively, declared for clarity) -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
+        <!-- Optional test support to keep the project compile-ready for future tests -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Spring Boot plugin to package and run the application -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+
