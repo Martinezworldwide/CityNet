@@ -195,26 +195,26 @@
         <div class="output" id="simulationOutput"></div>
         <div class="output" style="margin-top:0.5rem;">
             <strong>How to test (simulation)</strong><br>
-            1. Paste a JSON payload describing your real initial traffic state and parameters, then click <em>Run Simulation</em> to call
+            1. Paste the JSON payload below into the text area, then click <em>Run Simulation</em> to call
             <code>POST /simulate</code>. The Java backend runs the recursive <code>PredictiveTrafficSimulator</code> over a time horizon.<br>
-            2. Example JSON shape (fill in real intersection IDs and congestion values):<br>
+            2. Example JSON that works as-is:<br>
 <pre style="font-size:0.7rem;white-space:pre-wrap;word-break:break-word;">
 {
   "initialState": {
     "currentTime": 0,
     "congestionByIntersection": {
-      "INTERSECTION_A": CONGESTION_LEVEL_A,
-      "INTERSECTION_B": CONGESTION_LEVEL_B
+      "A": 10.0,
+      "B": 5.0
     },
     "signalByIntersection": {
-      "INTERSECTION_A": "GREEN",
-      "INTERSECTION_B": "BALANCED"
+      "A": "GREEN",
+      "B": "BALANCED"
     },
     "history": []
   },
   "horizon": 30,
   "timeStep": 5,
-  "congestionThreshold": CONGESTION_THRESHOLD_VALUE
+  "congestionThreshold": 3.0
 }
 </pre>
             3. The response shows a <code>timeline</code> of <code>TrafficState</code> objects and <code>signalRecommendations</code> derived from the recursive prediction.
