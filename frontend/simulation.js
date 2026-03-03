@@ -1,13 +1,12 @@
 // simulation.js connects the predictive traffic simulation UI to the /simulate endpoint.
-
-import { getBackendBaseUrl } from "./dashboard.js";
+// It relies on the global getBackendBaseUrl helper defined in dashboard.js.
 
 const simulationPayloadInput = document.getElementById("simulationPayload");
 const runSimulationButton = document.getElementById("runSimulationButton");
 const simulationOutput = document.getElementById("simulationOutput");
 
 async function runSimulation() {
-    const baseUrl = getBackendBaseUrl();
+    const baseUrl = window.getBackendBaseUrl();
     const raw = simulationPayloadInput.value.trim();
     if (!raw) {
         simulationOutput.textContent = "Provide a JSON payload with initialState, horizon, timeStep, and congestionThreshold.";

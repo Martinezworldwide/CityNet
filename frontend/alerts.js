@@ -1,6 +1,5 @@
 // alerts.js wires the alerts section of the dashboard to the backend heap priority endpoints.
-
-import { getBackendBaseUrl } from "./dashboard.js";
+// It relies on the global getBackendBaseUrl helper defined in dashboard.js.
 
 const alertMessageInput = document.getElementById("alertMessage");
 const alertSeverityInput = document.getElementById("alertSeverity");
@@ -9,7 +8,7 @@ const nextAlertButton = document.getElementById("nextAlertButton");
 const alertsOutput = document.getElementById("alertsOutput");
 
 async function createAlert() {
-    const baseUrl = getBackendBaseUrl();
+    const baseUrl = window.getBackendBaseUrl();
     const message = alertMessageInput.value.trim();
     const severity = parseInt(alertSeverityInput.value, 10);
 
@@ -36,7 +35,7 @@ async function createAlert() {
 }
 
 async function getNextAlert() {
-    const baseUrl = getBackendBaseUrl();
+    const baseUrl = window.getBackendBaseUrl();
     try {
         const response = await fetch(`${baseUrl}/alerts/next`);
         if (response.status === 204) {

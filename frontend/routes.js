@@ -1,6 +1,5 @@
 // routes.js connects the emergency routing UI to the RecursiveDijkstra-backed endpoint.
-
-import { getBackendBaseUrl } from "./dashboard.js";
+// It relies on the global getBackendBaseUrl helper defined in dashboard.js.
 
 const routeStartInput = document.getElementById("routeStart");
 const routeTargetInput = document.getElementById("routeTarget");
@@ -8,7 +7,7 @@ const requestRouteButton = document.getElementById("requestRouteButton");
 const routesOutput = document.getElementById("routesOutput");
 
 async function requestEmergencyRoute() {
-    const baseUrl = getBackendBaseUrl();
+    const baseUrl = window.getBackendBaseUrl();
     const start = routeStartInput.value.trim();
     const target = routeTargetInput.value.trim();
 
