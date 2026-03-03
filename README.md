@@ -349,6 +349,125 @@ Files:
 
 ---
 
+## How an instructor can test CityNet end-to-end
+
+### Backend base URL and origin
+
+- The deployed Java/Spring Boot backend runs on Render at:
+  - `https://citynet-backend.onrender.com`
+- The GitHub Pages frontend runs at:
+  - `https://martinezworldwide.github.io/CityNet/`
+- CORS is explicitly configured in `CorsConfig` so that:
+  - Origin `https://martinezworldwide.github.io` can call all REST endpoints on the Java backend.
+- On the live GitHub Pages dashboard, the **“Backend base URL”** field is **automatically populated** with:
+  - `https://citynet-backend.onrender.com`
+  - The frontend JavaScript always uses this URL when loaded from GitHub Pages, so no manual pasting is required.
+
+### Step-by-step interactive tests
+
+- **1. Heap-Prioritized Alerts (Java PriorityQueue max-heap)**
+  - On the dashboard, in the **“Heap-Prioritized Alerts”** card:
+    - Type any incident description into **“Alert message”**.
+    - Enter an integer into **“Severity”** (higher means higher priority).
+    - Click **“Create Alert”**.
+      - This issues `POST https://citynet-backend.onrender.com/alerts`.
+      - The Java backend:
+        - Deserializes JSON into `Alert`.
+        - Inserts it into a `PriorityQueue<Alert>` configured as a max-heap in `HeapPriorityService`.
+    - Click **“Get Next Alert”**.
+      - This issues `GET https://citynet-backend.onrender.com/alerts/next`.
+      - The backend removes and returns the highest-priority alert from the heap.
+  - **What to look for**:
+    - In browser DevTools → **Network**:
+      - The requests go to `https://citynet-backend.onrender.com/alerts` and `/alerts/next`.
+    - In the UI:
+      - The “next alert” shown matches max-heap behavior (highest severity, newest first) implemented with Java’s `PriorityQueue`.
+
+- **2. Emergency Route (RecursiveDijkstra with min-heap and recursion)**
+  - In the **“Emergency Route (Recursive Dijkstra)”** card:
+    - Enter a **start** and **target** intersection ID.
+    - Click **“Request Emergency Route”**.
+      - This issues `GET https://citynet-backend.onrender.com/routes/emergency?start=...&target=...`.
+      - The Java backend:
+        - Invokes `RouteService.computeEmergencyRoute`, which calls `RecursiveDijkstra.findShortestEmergencyRoute`.
+        - Runs Dijkstra’s algorithm recursively using a `PriorityQueue` min-heap and respecting dynamic congestion penalties and `blocked` edges.
+  - **Note**:
+    - The backend does not embed a synthetic road network; a non-empty path requires real edge data to be supplied from external sources or via the POST endpoint.
+  - **Optional direct Java-only test** (e.g., via curl or Postman) with user-provided real data:
+    - `POST https://citynet-backend.onrender.com/routes/emergency`  
+      **Request body shape** (the instructor should fill in real values appropriate to the course):
+
+```json
+{
+  "startIntersectionId": "START_INTERSECTION_ID",
+  "targetIntersectionId": "TARGET_INTERSECTION_ID",
+  "edges": [
+    {
+      "id": "EDGE_ID_1",
+      "fromIntersectionId": "START_INTERSECTION_ID",
+      "toIntersectionId": "INTERSECTION_B",
+      "baseTravelTime": 0.0,
+      "blocked": false
+    }
+  ],
+  "congestionPenalties": {
+    "EDGE_ID_1": 0.0
+  }
+}
+```
+
+- **3. Predictive Traffic Simulation (recursive time-step simulator)**
+  - In the **“Predictive Traffic Simulation”** card:
+    - Paste a JSON payload into the **“Simulation JSON payload”** text area.
+    - Click **“Run Simulation”**.
+      - This issues `POST https://citynet-backend.onrender.com/simulate`.
+      - The Java backend:
+        - Deserializes `TrafficState` and simulation parameters.
+        - Runs recursive `PredictiveTrafficSimulator.simulate`, building a `timeline` of `TrafficState` and a `signalRecommendations` map.
+  - **Example request body shape** (the instructor should provide real congestion values and intersection IDs):
+
+```json
+{
+  "initialState": {
+    "currentTime": 0,
+    "congestionByIntersection": {
+      "INTERSECTION_A": 0.0,
+      "INTERSECTION_B": 0.0
+    },
+    "signalByIntersection": {
+      "INTERSECTION_A": "GREEN",
+      "INTERSECTION_B": "BALANCED"
+    },
+    "history": []
+  },
+  "horizon": 30,
+  "timeStep": 5,
+  "congestionThreshold": 0.0
+}
+```
+
+  - **What to look for**:
+    - Response JSON containing:
+      - `timeline`: list of `TrafficState` objects showing congestion decay over time.
+      - `signalRecommendations`: final per-intersection recommendations such as `"EXTEND_GREEN"` or `"NORMAL_CYCLE"`.
+    - This response is produced entirely by the Java recursion in `PredictiveTrafficSimulator`.
+
+### Network-level verification of Java backend usage
+
+- In the browser, open **Developer Tools → Network** while interacting with the dashboard.
+- For each button:
+  - **Alerts**:
+    - Verify `POST /alerts` and `GET /alerts/next` requests to `https://citynet-backend.onrender.com`.
+  - **Routes**:
+    - Verify `GET /routes/emergency?start=...&target=...` (and optionally `POST /routes/emergency`) to the same backend.
+  - **Simulation**:
+    - Verify `POST /simulate` with a JSON body and JSON response.
+- This confirms that:
+  - The GitHub Pages frontend is not “faking” results; it is calling a real Java/Spring Boot service.
+  - The heap logic and recursion implementations in Java (`HeapPriorityService`, `RecursiveDijkstra`, `PredictiveTrafficSimulator`) are actually being exercised.
+
+---
+
 ## Mapping back to rubric requirements
 
 - **“Implements and explains all three aspects thoroughly, providing detailed analysis of recursion vs. iteration efficiency”**

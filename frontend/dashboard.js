@@ -4,8 +4,22 @@
 // Returns the backend base URL configured in the input field.
 function getBackendBaseUrl() {
     const input = document.getElementById("backendBaseUrl");
+    const isGithubPages = typeof window !== "undefined"
+        && window.location
+        && window.location.hostname === "martinezworldwide.github.io";
+
+    if (isGithubPages) {
+        // On the published GitHub Pages site, always use the deployed Render backend URL
+        // so instructors do not need to paste it manually.
+        const fixedUrl = "https://citynet-backend.onrender.com";
+        if (input) {
+            input.value = fixedUrl;
+        }
+        return fixedUrl;
+    }
+
     if (!input) {
-        // Fallback to localhost if the element is missing; this is safe and does not fabricate data.
+        // Fallback to localhost when running outside GitHub Pages.
         return "http://localhost:8886";
     }
     // Normalize the value and strip any trailing slashes so that fetch URLs

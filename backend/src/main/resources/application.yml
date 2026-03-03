@@ -3,7 +3,7 @@ spring:
     name: CityNetBackend
 
 server:
-  port: 8080 # Default HTTP port for the Spring Boot backend
+  port: ${PORT:8886} # Bind to Render's PORT if present; default to 8886 for local runs
 
 citynet:
   graph:
