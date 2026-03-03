@@ -1,37 +1,52 @@
 // routes.js connects the emergency routing UI to the RecursiveDijkstra-backed endpoint.
 // It relies on the global getBackendBaseUrl helper defined in dashboard.js.
+// Working example: POST /routes/emergency with pre-filled JSON so the instructor sees a route immediately.
 
-const routeStartInput = document.getElementById("routeStart");
-const routeTargetInput = document.getElementById("routeTarget");
-const requestRouteButton = document.getElementById("requestRouteButton");
+const routePayloadInput = document.getElementById("routePayload");
+const requestRoutePostButton = document.getElementById("requestRoutePostButton");
 const routesOutput = document.getElementById("routesOutput");
 
-async function requestEmergencyRoute() {
+// POST the route JSON to /routes/emergency and display path and totalCost.
+async function requestEmergencyRoutePost() {
     const baseUrl = window.getBackendBaseUrl();
-    const start = routeStartInput.value.trim();
-    const target = routeTargetInput.value.trim();
-
-    if (!start || !target) {
-        routesOutput.textContent = "Provide both start and target intersection identifiers.";
+    const raw = routePayloadInput.value.trim();
+    if (!raw) {
+        routesOutput.textContent = "Paste or use the pre-filled JSON in the text area, then click Run Emergency Route.";
         return;
     }
-
+    let payload;
     try {
-        const response = await fetch(`${baseUrl}/routes/emergency?start=${encodeURIComponent(start)}&target=${encodeURIComponent(target)}`);
+        payload = JSON.parse(raw);
+    } catch (e) {
+        routesOutput.textContent = `Invalid JSON: ${e.message}`;
+        return;
+    }
+    try {
+        const response = await fetch(`${baseUrl}/routes/emergency`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
         const json = await response.json();
-        if (!response.ok || !Array.isArray(json.path) || json.path.length === 0) {
-            routesOutput.textContent = "No route available. Ensure a real network is configured on the backend.";
+        if (!response.ok) {
+            routesOutput.textContent = `Error: ${json.message || response.statusText || response.status}`;
             return;
         }
-        routesOutput.textContent = `Path: ${json.path.join(" -> ")} (cost=${json.totalCost})`;
+        const path = json.path;
+        const cost = json.totalCost;
+        if (!Array.isArray(path) || path.length === 0) {
+            routesOutput.textContent = "No route found between start and target with the given edges.";
+            return;
+        }
+        routesOutput.textContent = `Path: ${path.join(" → ")} (cost=${cost})`;
     } catch (e) {
-        routesOutput.textContent = `Error requesting route: ${e}`;
+        routesOutput.textContent = `Error: ${e.message}`;
     }
 }
 
-if (requestRouteButton) {
-    requestRouteButton.addEventListener("click", () => {
-        requestEmergencyRoute().catch(() => {});
+if (requestRoutePostButton) {
+    requestRoutePostButton.addEventListener("click", () => {
+        requestEmergencyRoutePost().catch(() => {});
     });
 }
 

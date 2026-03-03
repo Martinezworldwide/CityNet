@@ -146,41 +146,50 @@
 
     <section class="card" id="routes-card">
         <h2>Emergency Route (Recursive Dijkstra)</h2>
-        <label for="routeStart">Start intersection ID</label>
-        <input type="text" id="routeStart" placeholder="Start intersection id">
-
-        <label for="routeTarget">Target intersection ID</label>
-        <input type="text" id="routeTarget" placeholder="Target intersection id">
-
-        <button id="requestRouteButton">Request Emergency Route</button>
-
-        <div class="output" id="routesOutput"></div>
-        <div class="output" style="margin-top:0.5rem;">
-            <strong>How to test (routes)</strong><br>
-            1. Provide real intersection identifiers in <em>Start</em> and <em>Target</em> (matching your road-network data).<br>
-            2. Click <em>Request Emergency Route</em> to call <code>GET /routes/emergency</code>, which runs the recursive
-            <code>RecursiveDijkstra</code> algorithm in Java using a min-heap <code>PriorityQueue</code>, blocked-road flags, and
-            congestion penalties supplied by your data source.<br>
-            3. To drive it directly with your own graph, use <code>POST /routes/emergency</code> (for example via Postman) with a JSON body shaped like:<br>
-<pre style="font-size:0.7rem;white-space:pre-wrap;word-break:break-word;">
-{
-  "startIntersectionId": "START_INTERSECTION_ID",
-  "targetIntersectionId": "TARGET_INTERSECTION_ID",
+        <p style="font-size:0.85rem;color:#9ca3af;margin:0 0 0.5rem 0;"><strong>Working example</strong> — the JSON below is pre-filled. Click the button to run the recursive Dijkstra on the Java backend.</p>
+        <label for="routePayload">Route request JSON (working example)</label>
+        <textarea id="routePayload" rows="22">{
+  "startIntersectionId": "A",
+  "targetIntersectionId": "C",
   "edges": [
     {
-      "id": "EDGE_ID_1",
-      "fromIntersectionId": "START_INTERSECTION_ID",
-      "toIntersectionId": "INTERSECTION_B",
-      "baseTravelTime": BASE_TRAVEL_TIME_SECONDS,
+      "id": "E_AB",
+      "fromIntersectionId": "A",
+      "toIntersectionId": "B",
+      "baseTravelTime": 5.0,
+      "blocked": false
+    },
+    {
+      "id": "E_BC",
+      "fromIntersectionId": "B",
+      "toIntersectionId": "C",
+      "baseTravelTime": 4.0,
+      "blocked": false
+    },
+    {
+      "id": "E_AC_SLOW",
+      "fromIntersectionId": "A",
+      "toIntersectionId": "C",
+      "baseTravelTime": 20.0,
       "blocked": false
     }
   ],
   "congestionPenalties": {
-    "EDGE_ID_1": CONGESTION_PENALTY_SECONDS
+    "E_AB": 0.0,
+    "E_BC": 0.0,
+    "E_AC_SLOW": 0.0
   }
-}
-</pre>
-            Replace the identifiers and numeric values with real data from your course dataset or lab.
+}</textarea>
+
+        <button id="requestRoutePostButton">Run Emergency Route</button>
+
+        <div class="output" id="routesOutput"></div>
+        <div class="output" style="margin-top:0.5rem;">
+            <strong>How to test (routes) — working example</strong><br>
+            1. The text area above contains a <strong>working example</strong>: a small graph with intersections <strong>A</strong>, <strong>B</strong>, <strong>C</strong>. The shortest path from A to C is <strong>A → B → C</strong> (total cost <strong>9.0</strong>); the direct edge A→C has cost 20.0, so the recursive Dijkstra avoids it.<br>
+            2. Click <em>Run Emergency Route</em>. The frontend sends this JSON to <code>POST /routes/emergency</code> on the Java backend.<br>
+            3. The backend runs <code>RecursiveDijkstra</code> (min-heap <code>PriorityQueue</code>, recursion over the graph) and returns the path and total cost.<br>
+            4. You should see: <strong>Path: A → B → C (cost=9.0)</strong> in the output above.
         </div>
     </section>
 
